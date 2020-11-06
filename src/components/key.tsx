@@ -1,12 +1,13 @@
 import React from 'react';
 
 interface KeyProps {
-  playNote(): void
+  id: string;
+  playNote(id: string, e: any): void
 }
 
 function Key(props: KeyProps) {
   return (
-      <div className="key" onClick={props.playNote}></div>
+      <div role="button" className="key" onClick={(e) => props.playNote(props.id, e)}></div>
     );
 }
 

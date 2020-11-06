@@ -3,8 +3,8 @@ import Key from './key';
 
 class Casio extends Component {
 
-  playNote() {
-    console.log('noted!');
+  playNote = (id: string, e: any) => {
+    console.log('noted!', { id, e });
   }
 
   render() {
@@ -53,41 +53,41 @@ class Casio extends Component {
               </div>
               <div className="keys-container">
                 <div className="white">
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
+                  <Key id="G0" playNote={this.playNote}/>
+                  <Key id="A0" playNote={this.playNote}/>
+                  <Key id="B0" playNote={this.playNote}/>
+                  <Key id="C1" playNote={this.playNote}/>
+                  <Key id="D1" playNote={this.playNote}/>
+                  <Key  id="E1"playNote={this.playNote}/>
+                  <Key id="F1" playNote={this.playNote}/>
+                  <Key id="G1" playNote={this.playNote}/>
+                  <Key  id="A1" playNote={this.playNote}/>
+                  <Key  id="B1" playNote={this.playNote}/>
+                  <Key id="C2" playNote={this.playNote}/>
+                  <Key id="D2" playNote={this.playNote}/>
+                  <Key id="E2" playNote={this.playNote}/>
+                  <Key id="F2" playNote={this.playNote}/>
+                  <Key id="G2" playNote={this.playNote}/>
+                  <Key id="A2" playNote={this.playNote}/>
+                  <Key id="B2" playNote={this.playNote}/>
                 </div>
                 <div className="black">
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
+                  <Key id="G#0" playNote={this.playNote}/>
+                  <Key id="A#0" playNote={this.playNote}/>
                   <div className=""></div>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
+                  <Key id="C#1" playNote={this.playNote}/>
+                  <Key id="D#1" playNote={this.playNote}/>
                   <div className=""></div>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
+                  <Key id="F#1" playNote={this.playNote}/>
+                  <Key id="G#1" playNote={this.playNote}/>
+                  <Key id="A#1" playNote={this.playNote}/>
                   <div className=""></div>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
+                  <Key id="C#2" playNote={this.playNote}/>
+                  <Key id="D#2" playNote={this.playNote}/>
                   <div className=""></div>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
-                  <Key playNote={this.playNote}/>
+                  <Key id="F#2" playNote={this.playNote}/>
+                  <Key id="G#2" playNote={this.playNote}/>
+                  <Key id="A#2" playNote={this.playNote}/>
                 </div>
             </div>
           </div>

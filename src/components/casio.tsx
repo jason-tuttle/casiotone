@@ -1,13 +1,39 @@
 import React, { Component } from 'react';
 import Key from './key';
+import Settings from './settings';
 
-class Casio extends Component {
+export enum Waveform {
+  Sine = 'sine',
+  Triangle = 'triangle',
+  Square = 'square',
+  Sawtooth = 'sawtooth',
+  Custom = 'custom',
+};
+
+interface State {
+  volume: number;
+  waveform: Waveform;
+}
+class Casio extends Component<{}, State> {
+  constructor(props: any) {
+    super(props);
+    this.state = { volume: 0.5, waveform: Waveform.Sine };
+  }
 
   playNote = (id: string, e: any) => {
     console.log('noted!', { id, e });
   }
+  changeVolume = (e: any) => {
+    const state = this.state;
+    this.setState({ ...state, volume: e.target.value });
+  }
+  changeWaveform = (e: any) => {
+    const state = this.state;
+    this.setState({ ...state, waveform: e.target.value });
+  }
 
   render() {
+    const { volume, waveform } = this.state;
     return (
       <section>
           <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet" />
@@ -92,6 +118,7 @@ class Casio extends Component {
             </div>
           </div>
         </div>
+        <Settings volume={volume} waveform={waveform} changeVolume={this.changeVolume} changeWaveform={this.changeWaveform}/>
       </section>
     )
   }

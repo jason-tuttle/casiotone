@@ -9,6 +9,18 @@ export enum Waveform {
   Sawtooth = 'sawtooth',
   Custom = 'custom',
 };
+const freqFactor = 1.059463094359295;
+
+function calculateFrequency(noteNum: number): number {
+  return 27.5 * Math.pow(freqFactor, noteNum);
+}
+function setNoteTable(): Array<number> {
+  let notes = [];
+  for (let i = 0; i <= 88; i++) {
+    notes[i] = calculateFrequency(i);
+  }
+  return notes;
+}
 
 interface State {
   volume: number;
@@ -18,7 +30,22 @@ class Casio extends Component<{}, State> {
   constructor(props: any) {
     super(props);
     this.state = { volume: 0.5, waveform: Waveform.Sine };
+    this.audioContext = new window.AudioContext();
+    this.oscList = [];
+    this.masterGainNode = undefined;
+    this.noteTable = setNoteTable();
+    this.sineTerms = new Float32Array([0, 0, 1, 0, 1]);
+    this.cosineTerms = new Float32Array(this.sineTerms.length);
+    this.customWaveform = this.audioContext.createPeriodicWave(this.cosineTerms, this.sineTerms);
   }
+
+  audioContext: AudioContext;
+  oscList: Array<any>;
+  masterGainNode?: GainNode;
+  noteTable: Array<number>;
+  sineTerms: Float32Array;
+  cosineTerms: Float32Array;
+  customWaveform: PeriodicWave;
 
   playNote = (id: string, e: any) => {
     console.log('noted!', { id, e });
@@ -36,7 +63,7 @@ class Casio extends Component<{}, State> {
     const { volume, waveform } = this.state;
     return (
       <section>
-          <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet" />
 
         <div className="wrapper" aria-label="Casio PT-1 Keyboard illustration made with HTML and CSS">
           <div className="casio" aria-hidden="true">

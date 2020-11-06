@@ -5,7 +5,7 @@ import Casio from './components/casio';
 function App() {
   return (
     <div className="App">
-      <Casio/>
+      <Casio />
     </div>
   );
 }

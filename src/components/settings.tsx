@@ -21,12 +21,12 @@ function Settings(props: Props) {
       </div>
       <div className="right">
         <span>Current waveform: </span>
-        <select name="waveform" onChange={props.changeWaveform}>
-          <option value="sine" selected={props.waveform === Waveform.Sine}>Sine</option>
-          <option value="square" selected={props.waveform === Waveform.Square}>Square</option>
-          <option value="sawtooth" selected={props.waveform === Waveform.Sawtooth}>Sawtooth</option>
-          <option value="triangle" selected={props.waveform === Waveform.Triangle}>Triangle</option>
-          <option value="custom" selected={props.waveform === Waveform.Custom}>Custom</option>
+        <select name="waveform" onChange={props.changeWaveform} value={props.waveform}>
+          <option value="sine">Sine</option>
+          <option value="square">Square</option>
+          <option value="sawtooth">Sawtooth</option>
+          <option value="triangle" >Triangle</option>
+          <option value="custom">Custom</option>
         </select>
       </div>
     </div>

@@ -6,6 +6,7 @@ interface Props {
   waveform: Waveform;
   changeVolume(e: any): void;
   changeWaveform(e: any): void;
+  panic(): void;
 }
 
 function Settings(props: Props) {
@@ -19,7 +20,7 @@ function Settings(props: Props) {
           <option value="1.0" label="100%"/>
         </datalist>
       </div>
-      <div className="right">
+      <div className="center">
         <span>Current waveform: </span>
         <select name="waveform" onChange={props.changeWaveform} value={props.waveform}>
           <option value="sine">Sine</option>
@@ -28,6 +29,9 @@ function Settings(props: Props) {
           <option value="triangle" >Triangle</option>
           <option value="custom">Custom</option>
         </select>
+      </div>
+      <div className="right">
+        <button className="panic" onClick={props.panic}>PANIC</button>
       </div>
     </div>
   )

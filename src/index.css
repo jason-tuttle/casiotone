@@ -7,7 +7,7 @@
 
 body {
   background-color: #333335;
-  background-color: #E996AF;
+  /* background-color: #E996AF; */
 }
 
 .casio {
@@ -873,16 +873,29 @@ body {
 
 .settingsBar {
   margin-top: 25px;
-  font-family: "Helvetica Neue", sans-serif;
+  font-family: "DIN Condensed", sans-serif;
   display: flex;
   flex-direction: row;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
   flex: 0 0 50vw;
+  color: white;
 }
 .left {
   margin-right: 10px;
 }
+.center {
+  margin: 0 10px;
+}
 .right {
   margin-left: 10px;
+}
+
+.panic {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
 }

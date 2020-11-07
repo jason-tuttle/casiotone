@@ -12,11 +12,11 @@ export enum Waveform {
 const freqFactor = 1.059463094359295;
 
 function calculateFrequency(noteNum: number): number {
-  return 27.5 * Math.pow(freqFactor, noteNum);
+  return 8.18 * Math.pow(freqFactor, noteNum);
 }
 function setNoteTable(): Array<number> {
   let notes = [];
-  for (let i = 0; i <= 88; i++) {
+  for (let i = 0; i <= 127; i++) {
     notes[i] = calculateFrequency(i);
   }
   return notes;
@@ -25,30 +25,46 @@ function setNoteTable(): Array<number> {
 interface State {
   volume: number;
   waveform: Waveform;
+  octave: number;
 }
 class Casio extends Component<{}, State> {
   constructor(props: any) {
     super(props);
-    this.state = { volume: 0.5, waveform: Waveform.Sine };
+    this.state = { volume: 0.5, waveform: Waveform.Sine, octave: 4 };
     this.audioContext = new window.AudioContext();
     this.oscList = [];
-    this.masterGainNode = undefined;
     this.noteTable = setNoteTable();
     this.sineTerms = new Float32Array([0, 0, 1, 0, 1]);
     this.cosineTerms = new Float32Array(this.sineTerms.length);
     this.customWaveform = this.audioContext.createPeriodicWave(this.cosineTerms, this.sineTerms);
+    this.setupAudio();
+  }
+
+  setupAudio() {
+    this.masterGainNode = this.audioContext.createGain();
+    this.masterGainNode.connect(this.audioContext.destination);
+    this.masterGainNode.gain.value = this.state.volume;
   }
 
   audioContext: AudioContext;
-  oscList: Array<any>;
+  oscList: Array<OscillatorNode | undefined>;
   masterGainNode?: GainNode;
   noteTable: Array<number>;
   sineTerms: Float32Array;
   cosineTerms: Float32Array;
   customWaveform: PeriodicWave;
 
-  playNote = (id: string, e: any) => {
-    console.log('noted!', { id, e });
+  transposeNote(note: number): number {
+    // MIDI notes go 0-127, piano starts at 22
+    return 20 + note + (this.state.octave * 12);
+  }
+
+  playNote = (note: number) => {
+    const playNote = this.transposeNote(note);
+    this.oscList[note] = this.startKey(this.noteTable[playNote]);
+  }
+  stopNote = (note: number) => {
+    this.stopKey(note);
   }
   changeVolume = (e: any) => {
     const state = this.state;
@@ -57,6 +73,36 @@ class Casio extends Component<{}, State> {
   changeWaveform = (e: any) => {
     const state = this.state;
     this.setState({ ...state, waveform: e.target.value });
+  }
+  startKey = (freq: number) : OscillatorNode | undefined => {
+    let { audioContext, masterGainNode } = this;
+    if (!masterGainNode || !audioContext) return;
+    masterGainNode.gain.value = this.state.volume;
+    let osc = audioContext.createOscillator();
+    osc.connect(masterGainNode);
+   
+    let type = this.state.waveform;
+   
+    if (type === Waveform.Custom) {
+      osc.setPeriodicWave(this.customWaveform);
+    } else {
+      osc.type = type;
+    }
+  
+    osc.frequency.value = freq;
+    console.log({ freq, type });
+    osc.start();
+   
+    return osc;
+  }
+  stopKey = (note: number): void => {
+    this.oscList[note]?.stop();
+    this.oscList[note] = undefined;
+  }
+  panic = (): void => {
+    this.oscList.forEach((osc: OscillatorNode | undefined) => {
+      if (osc) { osc.stop(); }
+    });
   }
 
   render() {
@@ -106,46 +152,52 @@ class Casio extends Component<{}, State> {
               </div>
               <div className="keys-container">
                 <div className="white">
-                  <Key id="G0" playNote={this.playNote}/>
-                  <Key id="A0" playNote={this.playNote}/>
-                  <Key id="B0" playNote={this.playNote}/>
-                  <Key id="C1" playNote={this.playNote}/>
-                  <Key id="D1" playNote={this.playNote}/>
-                  <Key  id="E1"playNote={this.playNote}/>
-                  <Key id="F1" playNote={this.playNote}/>
-                  <Key id="G1" playNote={this.playNote}/>
-                  <Key  id="A1" playNote={this.playNote}/>
-                  <Key  id="B1" playNote={this.playNote}/>
-                  <Key id="C2" playNote={this.playNote}/>
-                  <Key id="D2" playNote={this.playNote}/>
-                  <Key id="E2" playNote={this.playNote}/>
-                  <Key id="F2" playNote={this.playNote}/>
-                  <Key id="G2" playNote={this.playNote}/>
-                  <Key id="A2" playNote={this.playNote}/>
-                  <Key id="B2" playNote={this.playNote}/>
+                  <Key data-note-name="G0" note={0} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="A0" note={2} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="B0" note={4} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="C1" note={5} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="D1" note={7} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="E1" note={9} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="F1" note={10} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="G1" note={12} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="A1" note={14} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="B1" note={16} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="C2" note={17} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="D2" note={19} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="E2" note={21} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="F2" note={22} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="G2" note={24} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="A2" note={26} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="B2" note={28} playNote={this.playNote} stopNote={this.stopNote}/>
                 </div>
                 <div className="black">
-                  <Key id="G#0" playNote={this.playNote}/>
-                  <Key id="A#0" playNote={this.playNote}/>
+                  <Key data-note-name="G#0" note={1} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="A#0" note={3} playNote={this.playNote} stopNote={this.stopNote}/>
                   <div className=""></div>
-                  <Key id="C#1" playNote={this.playNote}/>
-                  <Key id="D#1" playNote={this.playNote}/>
+                  <Key data-note-name="C#1" note={6} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="D#1" note={8} playNote={this.playNote} stopNote={this.stopNote}/>
                   <div className=""></div>
-                  <Key id="F#1" playNote={this.playNote}/>
-                  <Key id="G#1" playNote={this.playNote}/>
-                  <Key id="A#1" playNote={this.playNote}/>
+                  <Key data-note-name="F#1" note={11} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="G#1" note={13} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="A#1" note={15} playNote={this.playNote} stopNote={this.stopNote}/>
                   <div className=""></div>
-                  <Key id="C#2" playNote={this.playNote}/>
-                  <Key id="D#2" playNote={this.playNote}/>
+                  <Key data-note-name="C#2" note={18} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="D#2" note={20} playNote={this.playNote} stopNote={this.stopNote}/>
                   <div className=""></div>
-                  <Key id="F#2" playNote={this.playNote}/>
-                  <Key id="G#2" playNote={this.playNote}/>
-                  <Key id="A#2" playNote={this.playNote}/>
+                  <Key data-note-name="F#2" note={23} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="G#2" note={25} playNote={this.playNote} stopNote={this.stopNote}/>
+                  <Key data-note-name="A#2" note={27} playNote={this.playNote} stopNote={this.stopNote}/>
                 </div>
             </div>
           </div>
         </div>
-        <Settings volume={volume} waveform={waveform} changeVolume={this.changeVolume} changeWaveform={this.changeWaveform}/>
+        <Settings
+          volume={volume}
+          waveform={waveform}
+          changeVolume={this.changeVolume}
+          changeWaveform={this.changeWaveform}
+          panic={this.panic}
+        />
       </section>
     )
   }

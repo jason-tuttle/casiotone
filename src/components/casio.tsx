@@ -29,7 +29,6 @@ const Keys = new Map([
   [";", 21],
   ["'", 22],
 ]);
-let KeysDown = new Set();
 
 const freqFactor = 1.059463094359295;
 
@@ -48,11 +47,17 @@ interface State {
   volume: number;
   waveform: Waveform;
   octave: number;
+  keysDown: Array<number>;
 }
 class Casio extends Component<{}, State> {
   constructor(props: any) {
     super(props);
-    this.state = { volume: 0.5, waveform: Waveform.Sine, octave: 4 };
+    this.state = {
+      volume: 0.5,
+      waveform: Waveform.Sine,
+      octave: 4,
+      keysDown: [],
+    };
     this.audioContext = new window.AudioContext();
     this.oscList = [];
     this.noteTable = setNoteTable();
@@ -85,16 +90,22 @@ class Casio extends Component<{}, State> {
   }
 
   keyDown = (e: any) => {
+    const state = this.state;
+    if (e.repeat) return;
     const note = Keys.get(e.key);
-    if (!note || KeysDown.has(e.key)) return;
-    KeysDown.add(e.key);
+    if (!note || state.keysDown.includes(note)) return;
+    this.setState({ ...state, keysDown: [...state.keysDown, note] });
     this.playNote(note);
   };
   keyUp = (e: any) => {
+    const state = this.state;
     const note = Keys.get(e.key);
     if (note) {
       this.stopNote(note);
-      KeysDown.delete(e.key);
+      this.setState({
+        ...state,
+        keysDown: state.keysDown.filter((key) => key !== note),
+      });
     }
   };
 
@@ -203,102 +214,119 @@ class Casio extends Component<{}, State> {
                 <Key
                   data-note-name="G0"
                   note={0}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="A0"
                   note={2}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="B0"
                   note={4}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="C1"
                   note={5}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="D1"
                   note={7}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="E1"
                   note={9}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="F1"
                   note={10}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="G1"
                   note={12}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="A1"
                   note={14}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="B1"
                   note={16}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="C2"
                   note={17}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="D2"
                   note={19}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="E2"
                   note={21}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="F2"
                   note={22}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="G2"
                   note={24}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="A2"
                   note={26}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="B2"
                   note={28}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
@@ -307,12 +335,14 @@ class Casio extends Component<{}, State> {
                 <Key
                   data-note-name="G#0"
                   note={1}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="A#0"
                   note={3}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
@@ -320,12 +350,14 @@ class Casio extends Component<{}, State> {
                 <Key
                   data-note-name="C#1"
                   note={6}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="D#1"
                   note={8}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
@@ -333,18 +365,21 @@ class Casio extends Component<{}, State> {
                 <Key
                   data-note-name="F#1"
                   note={11}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="G#1"
                   note={13}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="A#1"
                   note={15}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
@@ -352,12 +387,14 @@ class Casio extends Component<{}, State> {
                 <Key
                   data-note-name="C#2"
                   note={18}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="D#2"
                   note={20}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
@@ -365,18 +402,21 @@ class Casio extends Component<{}, State> {
                 <Key
                   data-note-name="F#2"
                   note={23}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="G#2"
                   note={25}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />
                 <Key
                   data-note-name="A#2"
                   note={27}
+                  keysDown={this.state.keysDown}
                   playNote={this.playNote}
                   stopNote={this.stopNote}
                 />

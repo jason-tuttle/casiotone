@@ -1,20 +1,21 @@
-import React from 'react';
+import React from "react";
 
 interface KeyProps {
-  note: number
-  playNote(note: number): void
+  note: number;
+  keysDown: Array<number>;
+  playNote(note: number): void;
   stopNote(note: number): void;
 }
 
 function Key(props: KeyProps) {
   return (
-      <div
-        role="button"
-        className="key"
-        onMouseDown={() => props.playNote(props.note)}
-        onMouseUp={() => props.stopNote(props.note)}
-      ></div>
-    );
+    <div
+      role="button"
+      className={`key ${props.keysDown.includes(props.note) ? "down" : ""}`}
+      onMouseDown={() => props.playNote(props.note)}
+      onMouseUp={() => props.stopNote(props.note)}
+    ></div>
+  );
 }
 
 export default Key;

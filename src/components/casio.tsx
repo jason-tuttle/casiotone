@@ -71,6 +71,7 @@ class Casio extends Component<{}, State> {
   }
 
   setupAudio() {
+    if (!this.audioContext) return;
     this.masterGainNode = this.audioContext.createGain();
     this.masterGainNode.connect(this.audioContext.destination);
     this.masterGainNode.gain.value = this.state.volume;
@@ -82,14 +83,24 @@ class Casio extends Component<{}, State> {
   noteTable: Array<number>;
   sineTerms: Float32Array;
   cosineTerms: Float32Array;
-  customWaveform: PeriodicWave;
+  customWaveform?: PeriodicWave;
 
   transposeNote(note: number): number {
     // MIDI notes go 0-127, piano starts at 22
     return 20 + note + this.state.octave * 12;
   }
 
+  powerOn = () => {
+    this.audioContext = new window.AudioContext();
+    this.customWaveform = this.audioContext.createPeriodicWave(
+      this.cosineTerms,
+      this.sineTerms
+    );
+    this.setupAudio();
+  };
+
   keyDown = (e: any) => {
+    if (this.audioContext.state !== "running") this.audioContext.resume();
     const state = this.state;
     if (e.repeat) return;
     const note = Keys.get(e.key);
@@ -101,7 +112,7 @@ class Casio extends Component<{}, State> {
     const state = this.state;
     const note = Keys.get(e.key);
     if (note) {
-      this.stopNote(note);
+      this.stopKey(note);
       this.setState({
         ...state,
         keysDown: state.keysDown.filter((key) => key !== note),
@@ -133,7 +144,7 @@ class Casio extends Component<{}, State> {
 
     let type = this.state.waveform;
 
-    if (type === Waveform.Custom) {
+    if (type === Waveform.Custom && !!this.customWaveform) {
       osc.setPeriodicWave(this.customWaveform);
     } else {
       osc.type = type;
@@ -141,11 +152,26 @@ class Casio extends Component<{}, State> {
 
     osc.frequency.value = freq;
     osc.start();
-    masterGainNode.gain.linearRampToValueAtTime(0.1, this.state.volume);
+    masterGainNode.gain.linearRampToValueAtTime(
+      this.state.volume,
+      audioContext.currentTime + 0.01
+    );
 
     return osc;
   };
   stopKey = (note: number): void => {
+    let { audioContext, masterGainNode } = this;
+    if (!masterGainNode || !audioContext) return;
+    console.log("note ramping start");
+    masterGainNode.gain.linearRampToValueAtTime(
+      0.0,
+      audioContext.currentTime + 0.5
+    );
+    setTimeout(() => this.noteOff(note), 500);
+  };
+
+  noteOff = (note: number) => {
+    console.log("note stopping");
     this.oscList[note]?.stop();
     this.oscList[note] = undefined;
   };
@@ -165,7 +191,11 @@ class Casio extends Component<{}, State> {
           href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap"
           rel="stylesheet"
         />
-
+        <div>
+          <button className="panic" onClick={this.powerOn}>
+            POWER
+          </button>
+        </div>
         <div
           className="wrapper"
           aria-label="Casio PT-1 Keyboard illustration made with HTML and CSS"

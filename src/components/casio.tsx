@@ -127,7 +127,7 @@ class Casio extends Component<{}, State> {
   startKey = (freq: number): OscillatorNode | undefined => {
     let { audioContext, masterGainNode } = this;
     if (!masterGainNode || !audioContext) return;
-    masterGainNode.gain.value = this.state.volume;
+    masterGainNode.gain.value = 0;
     let osc = audioContext.createOscillator();
     osc.connect(masterGainNode);
 
@@ -141,6 +141,7 @@ class Casio extends Component<{}, State> {
 
     osc.frequency.value = freq;
     osc.start();
+    masterGainNode.gain.linearRampToValueAtTime(0.1, this.state.volume);
 
     return osc;
   };
